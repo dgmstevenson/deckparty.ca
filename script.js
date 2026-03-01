@@ -94,6 +94,7 @@ function showStep(hide, show) {
 // ============================================================
 
 startBtn.addEventListener("click", () => {
+  posthog.capture("quiz_started");
   showStep(landing, questionsSection);
   setTimeout(() => renderQuestion(), 450);
 });
@@ -146,12 +147,23 @@ function selectAnswer(index) {
     score: ans.score,
   });
 
+  posthog.capture("question_answered", {
+    question_number: currentQuestion + 1,
+    question_text: q.text,
+    answer: ans.label,
+    answer_score: ans.score,
+  });
+
   setTimeout(() => {
     currentQuestion++;
     if (currentQuestion < questions.length) {
       renderQuestion();
     } else {
       progressFill.style.width = "100%";
+      posthog.capture("quiz_completed", {
+        total_question_score: userAnswers.reduce((s, a) => s + a.score, 0),
+        answers: userAnswers.map((a) => ({ q: a.questionText, a: a.answerLabel })),
+      });
       setTimeout(() => {
         showStep(questionsSection, weatherCheck);
         setTimeout(() => startWeatherCheck(), 500);
@@ -176,10 +188,12 @@ function startWeatherCheck() {
 
   navigator.geolocation.getCurrentPosition(
     (pos) => {
+      posthog.capture("geolocation_allowed");
       weatherStatus.textContent = "Found you! Checking the skies...";
       fetchWeather(pos.coords.latitude, pos.coords.longitude);
     },
     () => {
+      posthog.capture("geolocation_denied");
       showCityFallback();
     },
     { timeout: 8000 }
@@ -222,6 +236,7 @@ async function geocodeCity() {
     }
 
     const loc = data.results[0];
+    posthog.capture("city_searched", { city: city, resolved_city: loc.name, country: loc.country });
     // Switch to loading view
     cityFallback.style.display = "none";
     weatherLoading.style.display = "";
@@ -451,6 +466,18 @@ function buildVerdict(weather) {
   });
   verdictBreakdown.innerHTML = breakdownHTML;
 
+  posthog.capture("verdict_delivered", {
+    verdict: verdict.text,
+    total_score: totalScore,
+    max_score: totalMax,
+    score_ratio: Math.round(ratio * 100) / 100,
+    question_score: questionScore,
+    weather_score: weatherResult.score,
+    temperature: weather ? weather.temp : null,
+    weather_description: weather ? describeWeather(weather.code) : null,
+    city: weather ? weather.cityName : null,
+  });
+
   // Show verdict
   showStep(weatherCheck, verdictSection);
 }
@@ -460,6 +487,7 @@ function buildVerdict(weather) {
 // ============================================================
 
 restartBtn.addEventListener("click", () => {
+  posthog.capture("restart_clicked", { previous_verdict: verdictText.textContent });
   currentQuestion = 0;
   userAnswers = [];
   progressFill.style.width = "0%";
@@ -472,6 +500,7 @@ restartBtn.addEventListener("click", () => {
 });
 
 shareBtn.addEventListener("click", () => {
+  posthog.capture("result_shared", { verdict: verdictText.textContent });
   const text = `I asked deckparty.ca if it's time for a deck party and the answer was: "${verdictText.textContent}" 🎉`;
   if (navigator.share) {
     navigator.share({ title: "Deck Party Verdict", text, url: "https://deckparty.ca" }).catch(() => {});
