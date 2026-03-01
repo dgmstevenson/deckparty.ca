@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Is It Time for a Deck Party?</title>
+  <meta name="description" content="The only website that combines questionable decision-making with actual weather data to determine if you should throw a deck party.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Step 1: Landing -->
+  <section id="landing" class="step active">
+    <div class="container">
+      <h1 class="hero-title">Is it time for a<br><span class="highlight">deck party?</span></h1>
+      <p class="hero-subtitle">There's only one way to find out.</p>
+      <button id="start-btn" class="btn btn-primary">Let's Find Out</button>
+    </div>
+  </section>
+
+  <!-- Step 2: Questions -->
+  <section id="questions" class="step">
+    <div class="container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div id="question-container">
+        <h2 id="question-text" class="question-text"></h2>
+        <div id="answers-container" class="answers-container"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 3: Weather Check -->
+  <section id="weather-check" class="step">
+    <div class="container">
+      <div id="weather-loading" class="weather-state">
+        <h2 class="question-text">One last thing...</h2>
+        <p class="weather-subtitle">Let's check the vibe outside.</p>
+        <div class="spinner"></div>
+        <p class="weather-status" id="weather-status">Locating you on this planet...</p>
+      </div>
+      <div id="city-fallback" class="weather-state" style="display:none;">
+        <h2 class="question-text">No worries!</h2>
+        <p class="weather-subtitle">Just tell us roughly where you are.</p>
+        <div class="city-input-group">
+          <input type="text" id="city-input" class="city-input" placeholder="Enter your city..." autocomplete="off">
+          <button id="city-submit" class="btn btn-primary">Check Weather</button>
+        </div>
+        <p class="city-error" id="city-error"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 4: Verdict -->
+  <section id="verdict" class="step">
+    <div class="container">
+      <div class="verdict-card">
+        <p class="verdict-label">The verdict is in...</p>
+        <h2 id="verdict-text" class="verdict-text"></h2>
+        <div id="verdict-weather" class="verdict-weather"></div>
+        <div id="verdict-breakdown" class="verdict-breakdown"></div>
+        <div class="verdict-actions">
+          <button id="restart-btn" class="btn btn-secondary">Try Again</button>
+          <button id="share-btn" class="btn btn-primary">Share Result</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
